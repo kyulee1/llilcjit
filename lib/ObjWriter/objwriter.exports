@@ -3,6 +3,7 @@ FinishObjWriter
 SwitchSection
 EmitAlignment
 EmitBlob
+EmitLoc
 EmitIntValue
 EmitSymbolDef
 EmitSymbolRef

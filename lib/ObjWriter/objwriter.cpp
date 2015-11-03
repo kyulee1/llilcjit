@@ -255,7 +255,29 @@ extern "C" void SwitchSection(ObjectWriter *OW, const char *SectionName) {
   }
 
   OST.SwitchSection(Section);
+
+  MCSection *Sec = OST.getCurrentSection().first;
+  if (!Sec->getBeginSymbol()) {
+     MCSymbol *SectionStartSym = OutContext.createTempSymbol();
+     OST.EmitLabel(SectionStartSym);
+     Sec->setBeginSymbol(SectionStartSym);
+  }
+  bool InsertResult = OutContext.addGenDwarfSection(Sec);
+  assert(InsertResult && ".text section should not have debug info yet");
+  (void)InsertResult;
+  OutContext.setGenDwarfFileNumber(OST.EmitDwarfFileDirective(
+     0, StringRef(), "t3.cpp"));
 }
+
+extern "C" void EmitLoc(ObjectWriter *OW, int Line, int Col) {
+   auto *AsmPrinter = &OW->getAsmPrinter();
+   auto &OST = *AsmPrinter->OutStreamer;
+   MCContext &OutContext = OST.getContext();
+   OST.EmitDwarfLocDirective(
+      OutContext.getGenDwarfFileNumber(), Line, Col,
+   DWARF2_FLAG_IS_STMT, 0, 0, StringRef());
+}
+
 
 extern "C" void EmitAlignment(ObjectWriter *OW, int ByteAlignment) {
   assert(OW && "ObjWriter is null");
