@@ -256,7 +256,11 @@ extern "C" void SwitchSection(ObjectWriter *OW, const char *SectionName) {
 
   OST.SwitchSection(Section);
 
+  if (strcmp(SectionName, "text") == 0) {
   MCSection *Sec = OST.getCurrentSection().first;
+  Sec->setHasInstructions(true); // set instruction exists.
+  OutContext.setGenDwarfForAssembly(true); // fake we emitting dwarf for assembly file
+
   if (!Sec->getBeginSymbol()) {
      MCSymbol *SectionStartSym = OutContext.createTempSymbol();
      OST.EmitLabel(SectionStartSym);
@@ -266,7 +270,8 @@ extern "C" void SwitchSection(ObjectWriter *OW, const char *SectionName) {
   assert(InsertResult && ".text section should not have debug info yet");
   (void)InsertResult;
   OutContext.setGenDwarfFileNumber(OST.EmitDwarfFileDirective(
-     0, StringRef(), "t3.cpp"));
+     1, StringRef(), "t3.cpp"));
+  }
 }
 
 extern "C" void EmitLoc(ObjectWriter *OW, int Line, int Col) {
@@ -311,6 +316,19 @@ extern "C" void EmitSymbolDef(ObjectWriter *OW, const char *SymbolName) {
 
   MCSymbol *Sym = OutContext.getOrCreateSymbol(Twine(SymbolName));
   OST.EmitSymbolAttribute(Sym, MCSA_Global);
+
+// debug
+
+     // We create a temporary symbol for use for the AT_high_pc and AT_low_pc
+     // values so that they don't have things like an ARM thumb bit from the
+     // original symbol. So when used they won't get a low bit set after
+     // relocation.
+     MCSymbol *Label = OutContext.createTempSymbol();
+     OST.EmitLabel(Label);
+
+     // Create and entry for the info and add it to the other entries.
+     OutContext.addMCGenDwarfLabelEntry(
+        MCGenDwarfLabelEntry(SymbolName, 1, 1, Label));
   OST.EmitLabel(Sym);
 }
 
