@@ -1,12 +1,13 @@
 #ifndef JIT_DEBUG_INFO_H
 #define JIT_DEBUG_INFO_H
 
-typedef unsigned int DWORD;
-#define _TARGET_AMD64_ 1
-
+#include "global.h"
+#include "LLILCPal.h"
 #include "cordebuginfo.h"
 #include "cvconst.h"
+
 #include "llvm/DebugInfo/CodeView/SymbolRecord.h"
+
 
 // DIA headers must come after windows headers.
 

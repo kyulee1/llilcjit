@@ -274,10 +274,10 @@ extern "C" bool CreateDataSection(ObjectWriter *OW, const char *SectionName,
     break;
   case Triple::COFF: {
     unsigned Characteristics =
-        COFF::IMAGE_SCN_CNT_INITIALIZED_DATA | COFF::IMAGE_SCN_MEM_READ;
+        IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ;
 
     if (!IsReadOnly) {
-      Characteristics |= COFF::IMAGE_SCN_MEM_WRITE;
+      Characteristics |= IMAGE_SCN_MEM_WRITE;
     }
     Section = OutContext.getCOFFSection(SectionName, Characteristics, Kind);
     break;

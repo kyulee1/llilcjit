@@ -1,7 +1,11 @@
 project(objwriter)
 
+get_filename_component(LLILC_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/../../include ABSOLUTE)
+
 include_directories(${LLVM_INCLUDE_DIRS})
 include_directories(${CORECLR_INCLUDE})
+include_directories(${LLILC_INCLUDES}/Pal)
+include_directories(${LLILC_INCLUDES}/Jit)
 add_definitions(${LLVM_DEFINITIONS})
 
 if (WIN32)
